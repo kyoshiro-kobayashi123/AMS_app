@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_30_051835) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_30_061740) do
   create_table "absences", force: :cascade do |t|
     t.integer "student_id", null: false
     t.integer "time_slot_id", null: false
@@ -44,6 +44,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_051835) do
     t.string "name", limit: 20, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.index ["faculty_number"], name: "index_faculties_on_faculty_number", unique: true
+    t.index ["reset_password_token"], name: "index_faculties_on_reset_password_token", unique: true
   end
 
   create_table "lessons", force: :cascade do |t|
@@ -63,6 +68,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_051835) do
     t.string "emergency_contact", limit: 20
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.index ["reset_password_token"], name: "index_students_on_reset_password_token", unique: true
+    t.index ["student_number"], name: "index_students_on_student_number", unique: true
   end
 
   create_table "time_slots", force: :cascade do |t|
