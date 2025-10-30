@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  student_number: MyString
+  time_slot: one
+  kind: MyString
+  reason: MyString
+  detail: MyText
+  deadline: 2025-10-30
+  admin_approval: false
+
+two:
+  student_number: MyString
+  time_slot: two
+  kind: MyString
+  reason: MyString
+  detail: MyText
+  deadline: 2025-10-30
+  admin_approval: false
