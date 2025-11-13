@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "attendances/create"
   devise_for :students, controllers: {
     sessions: 'students/sessions'
   }
