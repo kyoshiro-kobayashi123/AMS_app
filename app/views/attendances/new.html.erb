@@ -1,0 +1,44 @@
+<h1>出席登録フォーム (動作確認用)</h1>
+
+<% if flash[:notice] %>
+  <p style="color: green;"><%= flash[:notice] %></p>
+<% end %>
+<% if flash[:alert] %>
+  <p style="color: red;"><%= flash[:alert] %></p>
+<% end %>
+
+<% # 現在ログインしている学生情報を表示（authenticate_student! が成功している前提） %>
+<p><strong>ログイン中の学生:</strong> <%= current_student.name %> (<%= current_student.student_number %>)</p>
+
+<hr>
+
+<h2>今日の授業</h2>
+
+<% # TimeSlot.all を使用していますが、実際は今日の日付と紐づく授業のみを表示すべきです %>
+<% TimeSlot.all.each do |time_slot| %>
+  <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
+    <h3><%= time_slot.lesson.lesson_name %></h3>
+    <p>
+      **コマ時間:** <%= time_slot.start_time.strftime('%H:%M') %> 〜 <%= time_slot.end_time.strftime('%H:%M') %><br>
+      **現在の判定時間:**
+      <%= time_slot.start_time.strftime('%H:%M') %> (開始)
+      〜 <%= (time_slot.start_time.to_time + 20.minutes).strftime('%H:%M') %> (遅刻締切)
+    </p>
+
+    <%= form_with(url: attendances_path, method: :post, local: true) do |form| %>
+      <%= form.hidden_field :time_slot_id, value: time_slot.id %>
+      
+      <% # ----------------------- 出席ボタン ----------------------- %>
+      <div style="margin-bottom: 10px;">
+        <%= form.submit "出席登録 (通常/遅刻)", data: { confirm: '出席または遅刻として登録しますか？' } %>
+      </div>
+
+      <% # ----------------------- 遅刻理由 ----------------------- %>
+      <p>
+        <%= form.label :late_reason, "遅刻理由 (遅刻の場合必須)" %><br>
+        <%= form.text_field :late_reason, placeholder: "例: 電車遅延" %>
+      </p>
+
+    <% end %>
+  </div>
+<% end %>
