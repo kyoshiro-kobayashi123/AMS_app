@@ -324,6 +324,7 @@ GEM
     thor (1.4.0)
     thruster (0.1.16)
     thruster (0.1.16-x86_64-linux)
+    timecop (0.9.10)
     timeout (0.4.4)
     tsort (0.2.0)
     turbo-rails (2.0.20)
@@ -378,6 +379,7 @@ DEPENDENCIES
   sqlite3 (>= 2.1)
   stimulus-rails
   thruster
+  timecop
   turbo-rails
   tzinfo-data
   web-console

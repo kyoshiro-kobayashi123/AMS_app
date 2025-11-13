@@ -63,3 +63,11 @@ group :test do
 end
 
 gem 'devise'
+
+
+
+# 追加gem
+group :development, :test do
+  # 開発・テスト用Gem
+  gem 'timecop'
+end
