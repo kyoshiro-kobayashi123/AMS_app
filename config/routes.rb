@@ -20,4 +20,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  resources :schedules, only: [:index]
+  # ルートURLをスケジュール一覧に設定
+  root to: 'schedules#index'
 end

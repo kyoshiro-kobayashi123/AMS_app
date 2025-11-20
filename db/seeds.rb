@@ -58,30 +58,30 @@ puts "  -> 授業2科目 作成完了"
 today = Date.current
 
 time_slots_data = [
-  { 
-    lesson: lesson1, 
+   { 
+    lesson: lesson1, # オブジェクト指向プログラミング
     date: today,
-    start_time: '09:30', 
-    end_time: '11:10', 
+    start_time: '09:00', # 1コマ目に合わせる
+    end_time: '10:00', 
     break_time: '00:00', 
-    attendance_start_time: '09:20' 
+    attendance_start_time: '08:50' 
   },
   { 
-    lesson: lesson1, 
+    lesson: lesson1, # オブジェクト指向プログラミング (2回目)
     date: today,
-    start_time: '11:20', 
-    end_time: '13:00', 
+    start_time: '10:10', # 2コマ目に合わせる (変更点)
+    end_time: '11:10',   # (変更点)
     break_time: '00:00', 
-    attendance_start_time: '11:10' 
+    attendance_start_time: '10:00' 
   },
   { 
-    lesson: lesson2, 
+    lesson: lesson2, # データベース概論
     date: today,
-    start_time: '13:45', 
-    end_time: '15:25', 
+    start_time: '13:20', # 4コマ目に合わせる (変更点)
+    end_time: '14:20',   # (変更点)
     break_time: '00:00', 
-    attendance_start_time: '13:35' 
-  },
+    attendance_start_time: '13:10' 
+  }
 ]
 
 time_slots_data.each do |data|
