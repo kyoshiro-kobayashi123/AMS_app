@@ -1,10 +1,129 @@
-/*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
- */
+/* ログイン画面 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'メイリオ', sans-serif;
+    background: #f5f5f5;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.screen {
+    background: white;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.screen-title {
+    background: #5cb85c;
+    color: white;
+    padding: 10px;
+    margin: -20px -20px 20px -20px;
+    border-radius: 6px 6px 0 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.btn {
+    padding: 10px 30px;
+    border: 2px solid #333;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 10px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #5cb85c;
+    color: white;
+    border-color: #5cb85c;
+}
+
+/* 教職員用ボタン */
+.btn-faculty {
+    background: #4a69bd;
+    color: white;
+    border-color: #4a69bd;
+    padding: 12px 40px;
+}
+
+.btn-faculty:hover {
+    background: #3c5aa6;
+    border-color: #3c5aa6;
+}
+
+/* ログインコンテナ */
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+}
+
+.login-form {
+    background: white;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.login-form h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 24px;
+    color: #333;
+}
+
+.login-subtitle {
+    text-align: center;
+    border: none;
+    margin-bottom: 30px;
+    font-size: 18px;
+    padding-bottom: 0;
+}
+
+/* 教職員ログイン用 */
+.faculty-login h1 {
+    color: #4a69bd;
+}
+
+.faculty-login .login-subtitle {
+    color: #4a69bd;
+}
+

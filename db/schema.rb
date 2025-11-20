@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_30_061740) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_20_024026) do
   create_table "absences", force: :cascade do |t|
     t.integer "student_id", null: false
     t.integer "time_slot_id", null: false
@@ -40,13 +40,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_061740) do
 
   create_table "faculties", force: :cascade do |t|
     t.string "faculty_number", limit: 20, null: false
-    t.string "password", null: false
+    t.string "password"
     t.string "name", limit: 20, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
+    t.string "encrypted_password"
     t.index ["faculty_number"], name: "index_faculties_on_faculty_number", unique: true
     t.index ["reset_password_token"], name: "index_faculties_on_reset_password_token", unique: true
   end
@@ -61,7 +62,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_061740) do
 
   create_table "students", force: :cascade do |t|
     t.string "student_number", limit: 20, null: false
-    t.string "password", null: false
+    t.string "password"
     t.string "name", limit: 100, null: false
     t.date "birth_date"
     t.string "address"
@@ -71,6 +72,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_30_061740) do
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
+    t.string "encrypted_password", default: "", null: false
     t.index ["reset_password_token"], name: "index_students_on_reset_password_token", unique: true
     t.index ["student_number"], name: "index_students_on_student_number", unique: true
   end

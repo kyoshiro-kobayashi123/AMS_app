@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "home/top"
   devise_for :students, controllers: {
     sessions: 'students/sessions'
   }
@@ -6,7 +7,11 @@ Rails.application.routes.draw do
   devise_for :faculties, controllers: {
     sessions: 'faculties/sessions'
   }
-  
+
+  #deviseのログイン機能を起動したときにのルートパスを設定
+  devise_scope :student do
+    root "home#top"
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

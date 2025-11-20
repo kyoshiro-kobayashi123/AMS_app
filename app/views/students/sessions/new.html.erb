@@ -1,28 +1,25 @@
-<h2>ログイン（学生）</h2>
+<div class="container">
+  <div class="screen">
+    <div class="screen-title">ログイン画面</div>
+    <div style="max-width: 400px; margin: 0 auto;">
+      <h2 style="text-align: center; margin-bottom: 30px;">出席管理システム</h2>
 
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+        <div class="form-group">
+          <%= f.label :student_number, "学籍番号" %>
+          <%= f.text_field :student_number, placeholder: "学籍番号を入力", autofocus: true, autocomplete: "student_number" %>
+        </div>
 
-  <div class="field">
-    <%= f.label :student_number, "学籍番号" %><br />
-    <%= f.text_field :student_number, autofocus: true, autocomplete: "student_number" %>
-  </div>
+        <div class="form-group">
+          <%= f.label :password, "パスワード" %>
+          <%= f.password_field :password, placeholder: "パスワードを入力", autocomplete: "current-password" %>
+        </div>
 
-  <div class="field">
-    <%= f.label :password, "パスワード" %><br />
-    <%= f.password_field :password, autocomplete: "current-password" %>
-  </div>
-
-  <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <%= f.check_box :remember_me %>
-      <%= f.label :remember_me, "ログインを記憶する" %>
+        <div style="text-align: center; margin-top: 30px;">
+          <%= f.submit "ログイン", class: "btn btn-primary" %>
+        </div>
+      <% end %>
     </div>
-  <% end %>
-
-  <div class="actions">
-    <%= f.submit "ログイン" %>
   </div>
 
-<% end %>
-
-<%= render "students/shared/links" %>
+</div>
