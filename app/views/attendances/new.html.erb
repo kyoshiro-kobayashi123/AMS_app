@@ -25,7 +25,7 @@
       〜 <%= (time_slot.start_time.to_time + 20.minutes).strftime('%H:%M') %> (遅刻締切)
     </p>
 
-    <%= form_with(url: attendances_path, method: :post, local: true) do |form| %>
+    <%= form_with url: attendances_path, method: :post, local: true, data: { turbo: false } do |form| %>
       <%= form.hidden_field :time_slot_id, value: time_slot.id %>
       
       <% # ----------------------- 出席ボタン ----------------------- %>

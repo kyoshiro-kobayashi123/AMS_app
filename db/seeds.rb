@@ -1,3 +1,18 @@
+puts "Seed開始：既存データをリセットします..."
+
+# 出席・コマ・授業を削除
+Attendance.delete_all
+TimeSlot.delete_all
+Lesson.delete_all
+# 学生を全削除（管理者はFacultyテーブルなので関係なし）
+Student.delete_all
+
+# 管理者もリセットしたい場合はFacultyを削除
+Faculty.delete_all
+
+puts "既存データを削除完了"
+
+
 # ----------------------------------------
 # 1. ユーザー (Faculty/Student) の作成
 # ----------------------------------------
@@ -61,26 +76,26 @@ time_slots_data = [
   { 
     lesson: lesson1, 
     date: today,
-    start_time: '09:30', 
-    end_time: '11:10', 
-    break_time: '00:00', 
-    attendance_start_time: '09:20' 
+    start_time: '09:30:00',
+    end_time: '11:10:00',
+    break_time: '00:00:00',
+    attendance_start_time: '09:20:00'
   },
   { 
     lesson: lesson1, 
     date: today,
-    start_time: '11:20', 
-    end_time: '13:00', 
-    break_time: '00:00', 
-    attendance_start_time: '11:10' 
+    start_time: '11:20:00',
+    end_time: '13:00:00',
+    break_time: '00:00:00',
+    attendance_start_time: '11:10:00'
   },
   { 
     lesson: lesson2, 
     date: today,
-    start_time: '13:45', 
-    end_time: '15:25', 
-    break_time: '00:00', 
-    attendance_start_time: '13:35' 
+    start_time: '13:45:00',
+    end_time: '15:25:00',
+    break_time: '00:00:00',
+    attendance_start_time: '13:35:00'
   },
 ]
 
@@ -103,27 +118,19 @@ puts "  -> コマ時間3件 作成完了"
 
 puts "3. Attendance (出席記録) のダミーデータを作成..."
 
-# 1コマ目のTimeSlotを取得
-time_slot1 = TimeSlot.find_by(date: today, start_time: '09:30:00')
+# 1コマ目のTimeSlotを取得（Timeオブジェクトで指定）
+time_slot1 = TimeSlot.find_by(date: today, start_time: today.beginning_of_day + 9.hours + 30.minutes)
 
 if time_slot1
-  # 学生1 (佐藤): 通常出席 (9:25 登録)
   student1 = Student.find_by(student_number: '2023001')
-  Attendance.find_or_create_by!(
-    student: student1, 
-    time_slot: time_slot1
-  ) do |a|
+  Attendance.find_or_create_by!(student: student1, time_slot: time_slot1) do |a|
     a.status = 'present'
     a.registered_at = today.beginning_of_day + 9.hours + 25.minutes
     a.admin_approval = true
   end
 
-  # 学生2 (田中): 遅刻 (9:40 登録)
   student2 = Student.find_by(student_number: '2023002')
-  Attendance.find_or_create_by!(
-    student: student2, 
-    time_slot: time_slot1
-  ) do |a|
+  Attendance.find_or_create_by!(student: student2, time_slot: time_slot1) do |a|
     a.status = 'late'
     a.registered_at = today.beginning_of_day + 9.hours + 40.minutes
     a.late_reason = '電車遅延のため'
@@ -134,5 +141,3 @@ if time_slot1
 else
   puts "  -> TimeSlotが見つかりませんでした"
 end
-
-puts "Seedデータの投入が完了しました。"

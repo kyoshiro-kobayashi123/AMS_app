@@ -28,12 +28,18 @@ Rails.application.routes.draw do
 
 
   # 追加コード
-  resources :attendances, only: [:new, :create]
+  resources :attendances, only: [:index, :new, :create]
 
   # 教員用のルーティング (faculties/attendances#index などにアクセス)
   namespace :faculties do
     resources :attendances, only: [:index, :update] do
     end
   end
+
+  # 学生ログイン画面のパス
+  # localhost:3000/students/sign_in
+
+  # 教員ログイン画面のパス
+  # localhost:3000/faculties/sign_in
 
 end

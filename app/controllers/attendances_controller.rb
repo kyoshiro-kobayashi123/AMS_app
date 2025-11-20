@@ -1,22 +1,21 @@
+# app/controllers/attendances_controller.rb
 class AttendancesController < ApplicationController
-  # ログインしている学生のみが実行可能と想定
   before_action :authenticate_student! 
 
   def create
-    # パラメータから time_slot_id を取得
     time_slot = TimeSlot.find(attendance_params[:time_slot_id])
     registration_time = Time.current
-    
-    # 登録済みかチェック（二重登録防止）
-    if current_student.attendances.exists?(time_slot: time_slot, date: Date.current)
-      redirect_to root_path, alert: "すでに出席登録済みです。"
+
+    # 二重登録チェック
+    if current_student.attendances.exists?(time_slot: time_slot, created_at: Date.current.all_day)
+      redirect_to new_attendance_path, alert: "すでに出席登録済みです。"
       return
     end
 
     status, late_reason, admin_approval = determine_status(time_slot, registration_time, attendance_params[:late_reason])
-    
+
     if status == 'error'
-      redirect_to root_path, alert: late_reason # エラーメッセージ
+      redirect_to new_attendance_path, alert: late_reason
       return
     end
 
@@ -29,53 +28,45 @@ class AttendancesController < ApplicationController
     )
 
     if attendance.save
-      redirect_to root_path, notice: "#{status == 'late' ? '遅刻申請' : '出席'}を登録しました。"
+      redirect_to new_attendance_path, notice: "#{status == 'late' ? '遅刻申請' : '出席'}を登録しました。"
     else
-      redirect_to root_path, alert: "登録に失敗しました。"
+      redirect_to new_attendance_path, alert: "登録に失敗しました。"
     end
   end
 
   private
-  
+
   def attendance_params
-    # フォームから time_slot_id と 遅刻理由 (late_reason) を受け取る
-    params.require(:attendance).permit(:time_slot_id, :late_reason)
+    params.permit(:time_slot_id, :late_reason)
   end
 
-  # statusを決定するコアロジック
+  # 出席ステータス判定
+  # 出席ステータス判定
   def determine_status(time_slot, registration_time, reason)
     today = Date.current
-    
-    # DBのTime型を、今日の日付と結合して正確な時刻オブジェクトにする
-    start_time = Time.zone.local(today.year, today.month, today.day, time_slot.start_time.hour, time_slot.start_time.min)
-    
-    # 💡 基準時刻の再計算
-    # 通常出席開始 = コマ開始 10分前
-    ten_minutes_before = start_time - 10.minutes 
-    
-    # 遅刻登録締め切り = コマ開始 20分後
-    late_deadline = start_time + 20.minutes 
-    
-    
+  
+    # TimeSlot#start_time は time 型。JSTとして扱いたいので hour/min/sec を直接使用
+    start_time = Time.zone.parse("#{today} #{time_slot.start_time.strftime('%H:%M:%S')}")
+  
+    ten_minutes_before = start_time - 10.minutes
+    late_deadline = start_time + 20.minutes
+  
     if registration_time.between?(ten_minutes_before, start_time)
-      # コマ開始10分前 (例: 9:20) ～ コマ開始 (例: 9:30) -> 通常出席
-      return ['present', nil, true] # 理由なし, 自動承認
-    
+      ['present', nil, true]
     elsif registration_time.between?(start_time + 1.second, late_deadline)
-      # コマ開始 (例: 9:30) ～ コマ開始20分後 (例: 9:50) -> 遅刻
       if reason.blank?
-        return ['error', '遅刻登録の場合は理由の入力が必要です。', false]
+        ['error', '遅刻登録の場合は理由の入力が必要です。', false]
+      else
+        ['late', reason, false]
       end
-      return ['late', reason, false] # 理由あり, 管理者承認待ち
-      
     else
-      # その他の時間帯 -> 登録不可
       if registration_time < ten_minutes_before
-        return ['error', 'まだ登録時間になっていません。（登録可能時間：コマ開始10分前）', false]
-      else # registration_time > late_deadline
-        # コマ開始30分後で自動欠席とする処理は、別途バッチ処理で実装するため、ここでは登録不可のエラーとする
-        return ['error', "登録時間を過ぎています。（遅刻締め切り：#{late_deadline.strftime('%H:%M')}）", false]
+        ['error', "まだ登録時間になっていません。（登録可能時間：#{ten_minutes_before.strftime('%H:%M')}）", false]
+      else
+        ['error', "登録時間を過ぎています。（遅刻締め切り：#{late_deadline.strftime('%H:%M')}）", false]
       end
     end
   end
+  
+
 end
