@@ -1,143 +1,179 @@
-puts "Seed開始：既存データをリセットします..."
+puts "=== Seed開始：既存データをリセットします ==="
 
-# 出席・コマ・授業を削除
-Attendance.delete_all
-TimeSlot.delete_all
-Lesson.delete_all
-# 学生を全削除（管理者はFacultyテーブルなので関係なし）
-Student.delete_all
+# 外部キー制約があっても消せるように一時的に無効化
+ActiveRecord::Base.connection.disable_referential_integrity do
+  # まず主要テーブルを削除
+  [Attendance, TimeSlot, Lesson, Student, Faculty].each do |model|
+    model.delete_all
+  end
 
-# 管理者もリセットしたい場合はFacultyを削除
-Faculty.delete_all
-
-puts "既存データを削除完了"
-
-
-# ----------------------------------------
-# 1. ユーザー (Faculty/Student) の作成
-# ----------------------------------------
-
-puts "1. Faculty (管理者) と Student (学生) の作成を開始..."
-
-# パスワードは仮で 'password' に設定します
-PASSWORD = 'password'
-
-# 教員/管理者 (Faculty)
-faculty = Faculty.find_or_create_by!(faculty_number: 'F001') do |f|
-  f.name = '山田 太郎 (管理者)'
-  f.password = PASSWORD
-  f.password_confirmation = PASSWORD
-end
-puts "  -> 管理者: #{faculty.name} (ID: #{faculty.faculty_number}) 作成完了"
-
-# 学生 (Student)
-students_data = [
-  { student_number: '2023001', name: '佐藤 葵', birth_date: Date.new(2004, 5, 10), address: '東京都', emergency_contact: '090-1111-2222' },
-  { student_number: '2023002', name: '田中 健太', birth_date: Date.new(2003, 8, 20), address: '大阪府', emergency_contact: '090-3333-4444' },
-  { student_number: '2023003', name: '鈴木 花子', birth_date: Date.new(2004, 1, 15), address: '福岡県', emergency_contact: '090-5555-6666' }
-]
-
-students_data.each do |data|
-  Student.find_or_create_by!(student_number: data[:student_number]) do |s|
-    s.name = data[:name]
-    s.birth_date = data[:birth_date]
-    s.address = data[:address]
-    s.emergency_contact = data[:emergency_contact]
-    s.password = PASSWORD
-    s.password_confirmation = PASSWORD
+  # Absences テーブルが存在する場合だけ、中身を削除（※クラスは触らない）
+  if ActiveRecord::Base.connection.table_exists?(:absences)
+    ActiveRecord::Base.connection.execute("DELETE FROM absences")
   end
 end
-puts "  -> 学生3名 作成完了 (パスワード: #{PASSWORD})"
+
+puts "-> 既存データ削除完了"
+
 
 # ----------------------------------------
-# 2. 授業 (Lesson) と コマ時間 (TimeSlot) の作成
+# 1. ユーザー (Faculty / Student) 作成
 # ----------------------------------------
 
-puts "2. Lesson (授業) と TimeSlot (コマ時間) の作成を開始..."
+puts "1. Faculty (教員) と Student (学生) を作成します..."
 
-# 授業 (Lesson)
-lesson1 = Lesson.find_or_create_by!(lesson_name: 'オブジェクト指向プログラミング') do |l|
-  l.faculty = faculty
-  # detailカラムが存在する場合のみ設定
-  l.detail = 'Ruby on Railsを用いた実践的なWeb開発技術を学ぶ。' if l.respond_to?(:detail=)
+PASSWORD = "password"
+
+faculty = Faculty.create!(
+  faculty_number: "F001",
+  name: "山田 太郎 (管理者)",
+  password: PASSWORD,
+  password_confirmation: PASSWORD
+)
+puts "  -> 教員: #{faculty.name} (ID: #{faculty.faculty_number}) 作成完了"
+
+students_data = [
+  { student_number: "2023001", name: "佐藤 葵",   birth_date: Date.new(2004, 5, 10), address: "東京都", emergency_contact: "090-1111-2222" },
+  { student_number: "2023002", name: "田中 健太", birth_date: Date.new(2003, 8, 20), address: "大阪府", emergency_contact: "090-3333-4444" },
+  { student_number: "2023003", name: "鈴木 花子", birth_date: Date.new(2004, 1, 15), address: "福岡県", emergency_contact: "090-5555-6666" }
+]
+
+students = students_data.map do |data|
+  Student.create!(
+    student_number:        data[:student_number],
+    name:                  data[:name],
+    birth_date:            data[:birth_date],
+    address:               data[:address],
+    emergency_contact:     data[:emergency_contact],
+    password:              PASSWORD,
+    password_confirmation: PASSWORD
+  )
 end
+puts "  -> 学生3名 作成完了（パスワード: #{PASSWORD}）"
 
-lesson2 = Lesson.find_or_create_by!(lesson_name: 'データベース概論') do |l|
-  l.faculty = faculty
-  l.detail = 'リレーショナルデータベースの設計とSQLを学ぶ。' if l.respond_to?(:detail=)
-end
-puts "  -> 授業2科目 作成完了"
+# ----------------------------------------
+# 2. 授業 (Lesson) と コマ時間 (TimeSlot) 作成
+# ----------------------------------------
 
-# コマ時間 (TimeSlot) の定義
-# 今日の日付を基準にする
+puts "2. Lesson (授業) と TimeSlot (コマ時間) を作成します..."
+
 today = Date.current
 
+lesson1 = Lesson.new(
+  lesson_name: "オブジェクト指向プログラミング",
+  faculty: faculty
+)
+lesson1.detail = "Ruby on Rails を用いた実践的な Web 開発。" if lesson1.respond_to?(:detail=)
+lesson1.save!
+
+lesson2 = Lesson.new(
+  lesson_name: "データベース概論",
+  faculty: faculty
+)
+lesson2.detail = "リレーショナル DB と SQL を学ぶ。" if lesson2.respond_to?(:detail=)
+lesson2.save!
+
+puts "  -> 授業2科目 作成完了"
+
+# 仕様通りの 1〜5コマ
+# 1コマ  9:00〜10:00（10分休憩）
+# 2コマ 10:10〜11:10（10分休憩）
+# 3コマ 11:20〜12:20（10分休憩）
+# 昼休憩 12:20〜13:20
+# 4コマ 13:20〜14:20（10分）
+# 5コマ 14:30〜15:30（ある学生のみ）
+
 time_slots_data = [
-  { 
-    lesson: lesson1, 
-    date: today,
-    start_time: '09:30:00',
-    end_time: '11:10:00',
-    break_time: '00:00:00',
-    attendance_start_time: '09:20:00'
+  {
+    name: "1コマ",
+    lesson: lesson1,
+    start_time: "09:00:00",
+    end_time: "10:00:00",
+    attendance_start_time: "08:50:00",
+    break_time: "00:10:00"
   },
-  { 
-    lesson: lesson1, 
-    date: today,
-    start_time: '11:20:00',
-    end_time: '13:00:00',
-    break_time: '00:00:00',
-    attendance_start_time: '11:10:00'
+  {
+    name: "2コマ",
+    lesson: lesson1,
+    start_time: "10:10:00",
+    end_time: "11:10:00",
+    attendance_start_time: "10:00:00",
+    break_time: "00:10:00"
   },
-  { 
-    lesson: lesson2, 
-    date: today,
-    start_time: '13:45:00',
-    end_time: '15:25:00',
-    break_time: '00:00:00',
-    attendance_start_time: '13:35:00'
+  {
+    name: "3コマ",
+    lesson: lesson1,
+    start_time: "11:20:00",
+    end_time: "12:20:00",
+    attendance_start_time: "11:10:00",
+    break_time: "00:10:00"
   },
+  {
+    name: "4コマ",
+    lesson: lesson2,
+    start_time: "13:20:00",
+    end_time: "14:20:00",
+    attendance_start_time: "13:10:00",
+    break_time: "00:10:00"
+  },
+  {
+    name: "5コマ",
+    lesson: lesson2,
+    start_time: "14:30:00",
+    end_time: "15:30:00",
+    attendance_start_time: "14:20:00",
+    break_time: "00:00:00"
+  }
 ]
 
-time_slots_data.each do |data|
-  TimeSlot.find_or_create_by!(
-    lesson: data[:lesson], 
-    date: data[:date],
-    start_time: data[:start_time]
-  ) do |ts|
-    ts.end_time = data[:end_time]
-    ts.break_time = data[:break_time]
-    ts.attendance_start_time = data[:attendance_start_time]
-  end
+time_slots = time_slots_data.map do |data|
+  ts = TimeSlot.create!(
+    lesson:                data[:lesson],
+    date:                  today,
+    start_time:            Time.zone.parse(data[:start_time]),
+    end_time:              Time.zone.parse(data[:end_time]),
+    attendance_start_time: Time.zone.parse(data[:attendance_start_time]),
+    break_time:            Time.zone.parse(data[:break_time])
+  )
+  puts "  -> #{data[:name]}: #{ts.start_time.strftime('%H:%M')}〜#{ts.end_time.strftime('%H:%M')} 作成"
+  ts
 end
-puts "  -> コマ時間3件 作成完了"
+
+puts "  -> コマ時間 #{time_slots.size}件 作成完了"
 
 # ----------------------------------------
-# 3. 出席記録 (Attendance) のダミーデータ作成
+# 3. 出席記録 (Attendance) ダミーデータ
 # ----------------------------------------
 
-puts "3. Attendance (出席記録) のダミーデータを作成..."
+puts "3. Attendance (出席記録) のダミーデータを作成します..."
 
-# 1コマ目のTimeSlotを取得（Timeオブジェクトで指定）
-time_slot1 = TimeSlot.find_by(date: today, start_time: today.beginning_of_day + 9.hours + 30.minutes)
+time_slot1 = time_slots.first # 1コマ目
 
-if time_slot1
-  student1 = Student.find_by(student_number: '2023001')
-  Attendance.find_or_create_by!(student: student1, time_slot: time_slot1) do |a|
-    a.status = 'present'
-    a.registered_at = today.beginning_of_day + 9.hours + 25.minutes
-    a.admin_approval = true
-  end
+student1 = students[0] # 佐藤 葵
+student2 = students[1] # 田中 健太
 
-  student2 = Student.find_by(student_number: '2023002')
-  Attendance.find_or_create_by!(student: student2, time_slot: time_slot1) do |a|
-    a.status = 'late'
-    a.registered_at = today.beginning_of_day + 9.hours + 40.minutes
-    a.late_reason = '電車遅延のため'
-    a.admin_approval = false
-  end
+# 1コマ目：出席
+Attendance.create!(
+  student:        student1,
+  time_slot:      time_slot1,
+  status:         "present",
+  registered_at:  Time.zone.local(today.year, today.month, today.day, 8, 55, 0), # 8:55
+  late_reason:    nil,
+  admin_approval: true
+)
 
-  puts "  -> ダミー出席データ (出席1名, 遅刻1名) 作成完了"
-else
-  puts "  -> TimeSlotが見つかりませんでした"
-end
+# 1コマ目：遅刻（承認待ち）
+Attendance.create!(
+  student:        student2,
+  time_slot:      time_slot1,
+  status:         "late",
+  registered_at:  Time.zone.local(today.year, today.month, today.day, 9, 5, 0), # 9:05
+  late_reason:    "電車遅延のため",
+  admin_approval: false
+)
+
+puts "  -> 出席1名, 遅刻1名 作成完了"
+
+puts "=== Seed完了！ ==="
+puts "教員ログインID: F001 / パスワード: #{PASSWORD}"
+puts "学生ログイン例: 2023001 / パスワード: #{PASSWORD}"

@@ -69,12 +69,12 @@ class AttendancesController < ApplicationController
     )
 
     # 遅刻締め切り（授業開始から20分後）
-    late_deadline = lesson_start + 20.minutes
+    # late_deadline = lesson_start + 20.minutes
 
     ################
     # テスト用コード #
     ################
-    # late_deadline = lesson_start + 5.hours
+    late_deadline = lesson_start + 5.hours
 
     if registration_time < attendance_start
       # 受付開始前
