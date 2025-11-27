@@ -57,6 +57,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_024026) do
     t.integer "faculty_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "detail"
     t.index ["faculty_id"], name: "index_lessons_on_faculty_id"
   end
 

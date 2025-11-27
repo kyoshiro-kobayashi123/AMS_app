@@ -1,4 +1,5 @@
 class Faculty < ApplicationRecord
+  has_many :lessons, dependent: :destroy
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable,
          authentication_keys: [:faculty_number]
