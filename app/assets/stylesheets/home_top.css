@@ -1,0 +1,397 @@
+/* トップページのスタイル */
+
+.top-page-container {
+  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  background-image: url('haikei.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.top-page-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.05) 100%);
+  pointer-events: none;
+}
+
+.top-header {
+  text-align: center;
+  margin-bottom: 60px;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.top-header h1 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 15px;
+  text-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 40px rgba(102, 126, 234, 0.5);
+  letter-spacing: -0.5px;
+}
+
+.top-header p {
+  font-size: 1.3rem;
+  color: #ffffff;
+  font-weight: 400;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ログインカードコンテナ */
+.login-cards {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ログインカード */
+.login-card {
+  flex: 1;
+  min-width: 320px;
+  max-width: 440px;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 28px;
+  padding: 50px 40px;
+  text-align: center;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.25),
+    0 0 0 2px rgba(255, 255, 255, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.login-card:hover::before {
+  opacity: 1;
+}
+
+.login-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 60px rgba(102, 126, 234, 0.3);
+}
+
+.login-card.student {
+  color: #667eea;
+}
+
+.login-card.faculty {
+  color: #f093fb;
+}
+
+/* カード内要素 */
+.card-icon {
+  margin-bottom: 25px;
+  line-height: 1;
+  position: relative;
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.card-icon .icon-image {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+}
+
+.login-card:hover .card-icon .icon-image {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.card-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.card-description {
+  font-size: 1.05rem;
+  color: #ffffff;
+  margin-bottom: 35px;
+  line-height: 1.7;
+  font-weight: 400;
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ログインボタン */
+.login-button {
+  width: 100%;
+  padding: 16px 24px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-decoration: none;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.3px;
+  margin-top: auto;
+}
+
+.login-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.login-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.login-button.student-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow:
+    0 10px 30px rgba(102, 126, 234, 0.45),
+    0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-button.student-btn:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6b4091 100%);
+  transform: translateY(-4px);
+  box-shadow:
+    0 15px 45px rgba(102, 126, 234, 0.6),
+    0 8px 16px rgba(0, 0, 0, 0.15);
+  color: white;
+}
+
+.login-button.faculty-btn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  box-shadow:
+    0 10px 30px rgba(240, 147, 251, 0.45),
+    0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-button.faculty-btn:hover {
+  background: linear-gradient(135deg, #e07ee8 0%, #e34659 100%);
+  transform: translateY(-4px);
+  box-shadow:
+    0 15px 45px rgba(240, 147, 251, 0.6),
+    0 8px 16px rgba(0, 0, 0, 0.15);
+  color: white;
+}
+
+/* ログイン済み表示ボックス */
+.logged-in-box {
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 28px;
+  text-align: center;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.25),
+    0 0 0 2px rgba(255, 255, 255, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 1;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.logged-in-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  border-radius: 24px 24px 0 0;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+}
+
+.logged-in-box.student-logged {
+  color: #667eea;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.logged-in-box.faculty-logged {
+  color: #f093fb;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.logged-in-box h3 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.logged-in-box p {
+  font-size: 1.15rem;
+  color: #ffffff;
+  margin-bottom: 30px;
+  font-weight: 400;
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .top-header {
+    margin-bottom: 40px;
+    padding: 0 15px;
+  }
+
+  .login-cards {
+    padding: 0 15px;
+  }
+
+  .top-header h1 {
+    font-size: 2.2rem;
+  }
+
+  .top-header p {
+    font-size: 1.1rem;
+  }
+
+  .login-cards {
+    gap: 25px;
+  }
+
+  .login-card {
+    min-width: 100%;
+    padding: 40px 30px;
+  }
+
+  .card-icon .icon-image {
+    width: 70px;
+    height: 70px;
+  }
+
+  .card-title {
+    font-size: 1.7rem;
+  }
+
+  .card-description {
+    font-size: 1rem;
+  }
+
+  .login-button {
+    padding: 14px 20px;
+    font-size: 1.05rem;
+  }
+
+  .logged-in-box {
+    padding: 40px 30px;
+  }
+
+  .logged-in-box h3 {
+    font-size: 1.7rem;
+  }
+
+  .logged-in-box p {
+    font-size: 1.05rem;
+  }
+}

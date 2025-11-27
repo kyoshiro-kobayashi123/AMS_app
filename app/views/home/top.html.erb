@@ -1,39 +1,46 @@
-<div class="container">
-  <div class="text-center" style="margin-top: 50px;">
-    <h1>出席管理システム</h1>
+<div class="container top-page-container">
+  <%# ヘッダー部分 %>
+  <div class="top-header">
+    <h1>📚 出席管理システム</h1>
     <p>対象を選択してログインしてください</p>
   </div>
 
   <%# --- 1. 学生がログインしている場合 --- %>
   <% if student_signed_in? %>
-    <div class="logged-in-box" style="border: 2px solid #007bff; padding: 20px; margin: 20px 0; text-align: center;">
-      <%# ▼ 修正点: email ではなく name を表示します %>
-      <h3>ようこそ、<%= current_student.name %> さん</h3>
+    <div class="logged-in-box student-logged">
+      <h3><%= image_tag "student.png", alt: "学生", style: "width: 40px; height: 40px; vertical-align: middle; margin-right: 10px;" %> ようこそ、<%= current_student.name %> さん</h3>
       <p>学籍番号: <%= current_student.student_number %></p>
-      <%= link_to "ログアウト", destroy_student_session_path, method: :delete, class: "btn btn-danger" %>
+      <%= link_to "ログアウト", destroy_student_session_path, method: :delete,
+          class: "btn btn-danger btn-lg",
+          style: "padding: 12px 40px; font-size: 1.1rem;" %>
     </div>
 
   <%# --- 2. 教職員がログインしている場合 --- %>
   <% elsif faculty_signed_in? %>
-    <div class="logged-in-box" style="border: 2px solid #28a745; padding: 20px; margin: 20px 0; text-align: center;">
-      <%# ▼ 教職員も email がないかもしれないので name か faculty_number に合わせる必要があります %>
-      <h3>ようこそ、<%= current_faculty.try(:name) || "教職員" %> 先生</h3>
-      <%= link_to "ログアウト", destroy_faculty_session_path, method: :delete, class: "btn btn-danger" %>
+    <div class="logged-in-box faculty-logged">
+      <h3><%= image_tag "teacher.png", alt: "教職員", style: "width: 40px; height: 40px; vertical-align: middle; margin-right: 10px;" %> ようこそ、<%= current_faculty.try(:name) || "教職員" %> 先生</h3>
+      <%= link_to "ログアウト", destroy_faculty_session_path, method: :delete,
+          class: "btn btn-danger btn-lg",
+          style: "padding: 12px 40px; font-size: 1.1rem;" %>
     </div>
 
-  <%# --- 3. 誰もログインしていない時（ここに入り口ボタンを置く） --- %>
+  <%# --- 3. 誰もログインしていない時（ログイン選択画面） --- %>
   <% else %>
-    <div class="row justify-content-center" style="margin-top: 40px;">
-      <div class="col-md-5" style="border: 1px solid #ddd; padding: 30px; margin: 10px; text-align: center; border-radius: 8px;">
-        <h2>👨‍🎓 学生の方</h2>
-        <p>授業の出席登録はこちら</p>
-        <%= link_to "学生ログイン画面へ", new_student_session_path, class: "btn btn-primary btn-lg btn-block" %>
+    <div class="login-cards">
+      <%# 学生用カード %>
+      <div class="login-card student">
+        <div class="card-icon"><%= image_tag "student.png", alt: "学生", class: "icon-image" %></div>
+        <h2 class="card-title">学生の方</h2>
+        <p class="card-description">授業の出席登録を行います。<br>学籍番号でログインしてください。</p>
+        <%= link_to "学生ログイン", new_student_session_path, class: "login-button student-btn" %>
       </div>
 
-      <div class="col-md-5" style="border: 1px solid #ddd; padding: 30px; margin: 10px; text-align: center; border-radius: 8px;">
-        <h2>👩‍🏫 教職員の方</h2>
-        <p>出席状況の確認・管理はこちら</p>
-        <%= link_to "教職員ログイン画面へ", new_faculty_session_path, class: "btn btn-success btn-lg btn-block" %>
+      <%# 教職員用カード %>
+      <div class="login-card faculty">
+        <div class="card-icon"><%= image_tag "teacher.png", alt: "教職員", class: "icon-image" %></div>
+        <h2 class="card-title">教職員の方</h2>
+        <p class="card-description">出席状況の確認・管理を行います。<br>教職員IDでログインしてください。</p>
+        <%= link_to "教職員ログイン", new_faculty_session_path, class: "login-button faculty-btn" %>
       </div>
     </div>
   <% end %>
