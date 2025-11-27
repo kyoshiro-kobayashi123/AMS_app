@@ -66,4 +66,4 @@ end
 gem 'devise'
 
 # Use bundled psych version for Windows compatibility
-gem 'psych', '~> 5.0.1'
+gem 'psych', '~> 5.2.6'
