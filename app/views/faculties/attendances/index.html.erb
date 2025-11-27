@@ -29,13 +29,22 @@
 
 <hr>
 
-<h2>集計結果 (JSONデータ)</h2>
+<h2>集計結果</h2>
 
 <p><strong>総件数:</strong> <%= @json_response[:details].count %></p>
 <ul>
   <% @json_response[:counts].each do |status, count| %>
+    <% label =
+      case status
+      when 'present'      then '出席'
+      when 'late'         then '遅刻'
+      when 'early_leave'  then '早退'
+      when 'absent'       then '欠席'
+      else status.upcase
+      end
+    %>
     <li>
-      <strong><%= status.upcase %>:</strong>
+      <strong><%= label %>:</strong>
       <%= count %>件
     </li>
   <% end %>
@@ -60,7 +69,14 @@
   </thead>
   <tbody>
     <% @json_response[:details].each do |att| %>
-      <% status = att[:status] %>
+      <% status       = att[:status] %>
+      <% status_label = att[:status_label] || case status
+        when 'present'      then '出席'
+        when 'late'         then '遅刻'
+        when 'early_leave'  then '早退'
+        when 'absent'       then '欠席'
+        else status
+      end %>
       <% color =
         case status
         when 'late'        then 'orange'
@@ -75,15 +91,19 @@
         <td><%= att[:name] %></td>
         <td><%= att[:lesson_name] %></td>
         <td><%= att[:registered_at] %></td>
+
         <td>
           <strong style="color: <%= color %>;">
-            <%= status.upcase %>
+            <%= status_label %>
           </strong>
         </td>
+
         <td><%= att[:late_reason] %></td>
+
         <td><%= att[:admin_approval] ? '✅ 承認済' : '❌ 未承認' %></td>
+
         <td>
-          <%# 遅刻承認ボタン（遅刻＆未承認のときだけ表示） %>
+          <%# --- 遅刻承認ボタン（遅刻＆未承認時のみ） --- %>
           <% if status == 'late' && !att[:admin_approval] %>
             <%= form_with(url: faculties_attendance_path(att[:id]),
                           method: :patch,
@@ -94,8 +114,8 @@
             <% end %>
           <% end %>
 
-          <%# 早退に変更ボタン（present のときだけ表示する例） %>
-          <% if status == 'present' %>
+          <%# --- 早退にする（出席 or 遅刻のときだけ出す） --- %>
+          <% if %w[present late].include?(status) %>
             <%= form_with(url: faculties_attendance_path(att[:id]),
                           method: :patch,
                           local: true) do |form| %>
@@ -105,13 +125,26 @@
             <% end %>
           <% end %>
 
-          <%# 欠席に変更ボタン（どのステータスからでも欠席にできる） %>
-          <%= form_with(url: faculties_attendance_path(att[:id]),
-                        method: :patch,
-                        local: true) do |form| %>
-            <%= form.hidden_field :status, value: 'absent' %>
-            <%= form.submit "欠席にする",
-                  style: "background: salmon; border: none; padding: 4px 8px; margin-top: 4px;" %>
+          <%# --- 欠席にする（今が欠席じゃないときだけ） --- %>
+          <% if status != 'absent' %>
+            <%= form_with(url: faculties_attendance_path(att[:id]),
+                          method: :patch,
+                          local: true) do |form| %>
+              <%= form.hidden_field :status, value: 'absent' %>
+              <%= form.submit "欠席にする",
+                    style: "background: salmon; border: none; padding: 4px 8px; margin-top: 4px;" %>
+            <% end %>
+          <% end %>
+
+          <%# --- 出席にする（今が出席じゃないときだけ） --- %>
+          <% if status != 'present' %>
+            <%= form_with(url: faculties_attendance_path(att[:id]),
+                          method: :patch,
+                          local: true) do |form| %>
+              <%= form.hidden_field :status, value: 'present' %>
+              <%= form.submit "出席にする",
+                    style: "background: lightgreen; border: none; padding: 4px 8px; margin-top: 4px;" %>
+            <% end %>
           <% end %>
         </td>
       </tr>
