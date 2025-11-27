@@ -5,33 +5,29 @@ class Faculties::AttendancesController < ApplicationController
   # 検索と一覧表示、集計を行うアクション
   def index
     search_params = attendance_search_params
-  
-    # まず基本となるクエリを設定
-    @attendances = Attendance.joins(time_slot: :lesson).includes(:student).all
-  
-    target_date = search_params[:date].present? ? Date.parse(search_params[:date]) : Date.current
 
-    @attendances = @attendances.where(
-      "(DATE(attendances.registered_at) = :date) OR (attendances.status = 'absent' AND DATE(attendances.created_at) = :date)",
-      date: target_date
-    )
+    @attendances = Attendance
+      .joins(time_slot: :lesson)
+      .includes(:student, :time_slot)
 
-  
-    # 検索条件の適用
+    target_date =
+      if search_params[:date].present?
+        Date.parse(search_params[:date])
+      else
+        Date.current
+      end
+
+    # ✅ 出欠の「日付」は time_slots.date で絞る
+    @attendances = @attendances.where(time_slots: { date: target_date })
+
     if search_params[:lesson_name].present?
-      @attendances = @attendances.where("lessons.lesson_name = ?", search_params[:lesson_name])
+      @attendances = @attendances.where(lessons: { lesson_name: search_params[:lesson_name] })
     end
-  
-    if search_params[:date].present?
-      target_date = Date.parse(search_params[:date])
-      @attendances = @attendances.where("DATE(attendances.registered_at) = ? OR attendances.status = 'absent'", target_date)
-    end
-  
+
     if search_params[:time_slot_id].present?
       @attendances = @attendances.where(time_slot_id: search_params[:time_slot_id])
     end
-  
-    # JSONレスポンスを作成
+
     @json_response = {
       counts: @attendances.group(:status).count,
       details: @attendances.map do |att|
@@ -39,7 +35,7 @@ class Faculties::AttendancesController < ApplicationController
           id: att.id,
           student_number: att.student.student_number,
           name: att.student.name,
-          registered_at: att.registered_at&.strftime('%H:%M') || '---', 
+          registered_at: att.registered_at&.strftime('%H:%M') || '---',
           status: att.status,
           late_reason: att.late_reason,
           lesson_name: att.time_slot.lesson.lesson_name,
@@ -47,9 +43,11 @@ class Faculties::AttendancesController < ApplicationController
         }
       end
     }
-  
+
     render :index
   end
+  
+  
   
 
   # 状態変更/承認を行うアクション
