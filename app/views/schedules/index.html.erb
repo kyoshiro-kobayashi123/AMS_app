@@ -41,25 +41,28 @@
               <% time_slot = @time_slots_map[[day, period[:time]]] %>
               
               <% if time_slot %>
-                <!-- 授業がある場合の表示 -->
+                <!-- 授業がある場合 -->
                 <div class="lesson-card p-2" style="background-color: #eef8ff; border-radius: 5px;">
-                  
-                  <!-- 授業名 -->
                   <div class="fw-bold mb-1 text-primary">
-                    <%= time_slot.lesson.lesson_name %>
+                    <%= time_slot.lesson&.lesson_name %>
                   </div>
-                  
-                  <!-- 担当教員名 -->
-                  <% if time_slot.lesson.faculty %>
-                    <span class="badge bg-success">
-                      <%= time_slot.lesson.faculty.name %> 先生
-                    </span>
+
+                  <!-- ▼▼▼ 教員だけ編集ボタンが見える ▼▼▼ -->
+                  <% if faculty_signed_in?  %>
+                    <div class="mt-1">
+                      <%= link_to '編集', edit_schedule_path(time_slot), class: "btn btn-sm btn-outline-secondary" %>
+                    </div>
                   <% end %>
-                  
                 </div>
               <% else %>
-                <!-- 授業がない場合は空欄 -->
-                &nbsp;
+                <!-- 授業がない場合（空きコマ） -->
+                
+                <!-- ▼▼▼ 教員だけ『追加』ボタンが見える ▼▼▼ -->
+                <% if  faculty_signed_in? %>
+                  <%= link_to '+登録', new_schedule_path(date: day, time: period[:time]), class: "btn btn-sm btn-light text-muted" %>
+                <% else %>
+                  &nbsp;
+                <% end %>
               <% end %>
             </td>
           <% end %>
