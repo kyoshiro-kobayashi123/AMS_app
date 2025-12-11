@@ -372,6 +372,7 @@ DEPENDENCIES
   sqlite3 (>= 2.1)
   stimulus-rails
   thruster
+  timecop
   turbo-rails
   tzinfo-data
   web-console
