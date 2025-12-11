@@ -33,6 +33,7 @@ class SchedulesController < ApplicationController
   def authenticate_any!
     # 生徒も教員もログインしていなければ、生徒のログイン画面へ飛ばす
     unless student_signed_in? || faculty_signed_in?
+      puts "ログインしてません"
       redirect_to new_student_session_path, alert: "ログインしてください"
     end
   end
