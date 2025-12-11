@@ -1,4 +1,5 @@
 class SchedulesController < ApplicationController
+  before_action :authenticate_any!
   def index
     # Use the start_date from params if it exists, otherwise use today's date.
     @date = params[:start_date] ? Date.parse(params[:start_date]) : Date.today
@@ -28,5 +29,11 @@ class SchedulesController < ApplicationController
       { name: "5コマ", time: "14:30-15:30", start_time: "14:30" },
       # 必要に応じて4コマ、5コマと追加してください
     ]
+  end
+  def authenticate_any!
+    # 生徒も教員もログインしていなければ、生徒のログイン画面へ飛ばす
+    unless student_signed_in? || faculty_signed_in?
+      redirect_to new_student_session_path, alert: "ログインしてください"
+    end
   end
 end
