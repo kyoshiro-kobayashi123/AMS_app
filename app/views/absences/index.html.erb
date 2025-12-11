@@ -1,30 +1,46 @@
-
 <h1>欠席届提出</h1>
 
-<h2>届出種類</h2>
-<select name="example">
-<option>選択してください</option>
-<option>公欠届</option>
-<option>欠席届</option>
-</select>
+<nav>
+  <% if student_signed_in? %>
+    <span>
+      ログイン中の生徒番号: <strong><%= current_student.student_number %></strong>
+    </span>
+    <%= link_to 'ログアウト', destroy_student_session_path, method: :delete %>
+  <% else %>
+    <%= link_to '生徒ログイン', new_student_session_path %>
+  <% end %>
+</nav>
 
-<h2>公欠理由(公欠届の場合)</h2>
-<select name="example">
-<option>選択してください</option>
-<option>公欠届</option>
-<option>欠席届</option>
-</select>
+<%= form_with model: @absence, url: absences_path, local: true do |f| %>
 
-<h2>詳細入力</h2>
-<input>
+  <h2>届出種類</h2>
+  <%= f.select :kind,
+      [['選択してください', ''], ['公欠', '公欠'], ['欠席', '欠席'], ['忌引', '忌引']],
+      {}, class: "form-select" %>
 
-<h2>対象日</h2>
-<input type="date">
+  <h2>公欠理由（公欠の場合）</h2>
+  <%= f.select :reason,
+      [['選択してください', ''], ['就職活動関連', '就職活動関連'], ['葬式など', '葬式など'], ['その他', 'その他']],
+      {}, class: "form-select" %>
 
-<h2>対象コマ</h2>
-<input  type="checkbox" name="hbit" value="">1コマ
-<input  type="checkbox" name="hbit" value="">2コマ
-<input  type="checkbox" name="hbit" value="">3コマ
-<input  type="checkbox" name="hbit" value="">4コマ
-<input  type="checkbox" name="hbit" value="">5コマ
+  <div>
+    <h2>詳細入力</h2>
+    <%= f.text_field :detail, class: "form-control" %>
+  </div>
 
+  <h2>対象日</h2>
+  <%= f.date_field :target_date, class: "form-control" %>
+
+  <h2>対象コマ</h2>
+  <% (1..5).each do |i| %>
+    <label>
+      <%= f.check_box :periods, { multiple: true }, i, nil %>
+      <%= "#{i}コマ" %>
+    </label>
+  <% end %>
+
+  <div>
+    <%= f.submit "提出", class: "btn btn-primary" %>
+  </div>
+
+<% end %>
