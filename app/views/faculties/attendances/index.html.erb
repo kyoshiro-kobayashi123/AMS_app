@@ -1,0 +1,153 @@
+<h1>教員向け 出席管理画面 (動作確認用)</h1>
+
+<% if notice %>
+  <p style="color: green;">✅ <%= notice %></p>
+<% end %>
+<% if alert %>
+  <p style="color: red;">❌ <%= alert %></p>
+<% end %>
+
+<hr>
+
+<h2>検索</h2>
+
+<%= form_with(url: faculties_attendances_path, method: :get, local: true) do |form| %>
+  <fieldset style="padding: 10px; margin-bottom: 15px;">
+    <div style="margin-bottom: 8px;">
+      <%= form.label :lesson_name, "授業名" %>
+      <%= form.text_field :lesson_name, value: params[:lesson_name] %>
+    </div>
+
+    <div style="margin-bottom: 8px;">
+      <%= form.label :date, "日付" %>
+      <%= form.date_field :date, value: params[:date] || Date.current %>
+    </div>
+
+    <%= form.submit "検索", style: "padding: 4px 10px;" %>
+  </fieldset>
+<% end %>
+
+<hr>
+
+<h2>集計結果</h2>
+
+<p><strong>総件数:</strong> <%= @json_response[:details].count %></p>
+<ul>
+  <% @json_response[:counts].each do |status, count| %>
+    <% label =
+      case status
+      when 'present'      then '出席'
+      when 'late'         then '遅刻'
+      when 'early_leave'  then '早退'
+      when 'absent'       then '欠席'
+      else status.upcase
+      end
+    %>
+    <li>
+      <strong><%= label %>:</strong>
+      <%= count %>件
+    </li>
+  <% end %>
+</ul>
+
+<hr>
+
+<h2>詳細一覧</h2>
+
+<table border="1" cellpadding="10" style="width: 100%; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th>学生番号</th>
+      <th>氏名</th>
+      <th>授業</th>
+      <th>登録時刻</th>
+      <th>ステータス</th>
+      <th>理由</th>
+      <th>承認状況</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @json_response[:details].each do |att| %>
+      <% status       = att[:status] %>
+      <% status_label = att[:status_label] || case status
+        when 'present'      then '出席'
+        when 'late'         then '遅刻'
+        when 'early_leave'  then '早退'
+        when 'absent'       then '欠席'
+        else status
+      end %>
+      <% color =
+        case status
+        when 'late'        then 'orange'
+        when 'absent'      then 'red'
+        when 'early_leave' then 'blue'
+        else 'green'
+        end
+      %>
+
+      <tr>
+        <td><%= att[:student_number] %></td>
+        <td><%= att[:name] %></td>
+        <td><%= att[:lesson_name] %></td>
+        <td><%= att[:registered_at] %></td>
+
+        <td>
+          <strong style="color: <%= color %>;">
+            <%= status_label %>
+          </strong>
+        </td>
+
+        <td><%= att[:late_reason] %></td>
+
+        <td><%= att[:admin_approval] ? '✅ 承認済' : '❌ 未承認' %></td>
+
+        <td>
+          <%# --- 遅刻承認ボタン（遅刻＆未承認時のみ） --- %>
+          <% if status == 'late' && !att[:admin_approval] %>
+            <%= form_with(url: faculties_attendance_path(att[:id]),
+                          method: :patch,
+                          local: true) do |form| %>
+              <%= form.hidden_field :admin_approval, value: true %>
+              <%= form.submit "遅刻承認",
+                    style: "background: yellowgreen; border: none; padding: 4px 8px; margin-bottom: 4px;" %>
+            <% end %>
+          <% end %>
+
+          <%# --- 早退にする（出席 or 遅刻のときだけ出す） --- %>
+          <% if %w[present late].include?(status) %>
+            <%= form_with(url: faculties_attendance_path(att[:id]),
+                          method: :patch,
+                          local: true) do |form| %>
+              <%= form.hidden_field :status, value: 'early_leave' %>
+              <%= form.submit "早退にする",
+                    style: "background: lightskyblue; border: none; padding: 4px 8px; margin-bottom: 4px;" %>
+            <% end %>
+          <% end %>
+
+          <%# --- 欠席にする（今が欠席じゃないときだけ） --- %>
+          <% if status != 'absent' %>
+            <%= form_with(url: faculties_attendance_path(att[:id]),
+                          method: :patch,
+                          local: true) do |form| %>
+              <%= form.hidden_field :status, value: 'absent' %>
+              <%= form.submit "欠席にする",
+                    style: "background: salmon; border: none; padding: 4px 8px; margin-top: 4px;" %>
+            <% end %>
+          <% end %>
+
+          <%# --- 出席にする（今が出席じゃないときだけ） --- %>
+          <% if status != 'present' %>
+            <%= form_with(url: faculties_attendance_path(att[:id]),
+                          method: :patch,
+                          local: true) do |form| %>
+              <%= form.hidden_field :status, value: 'present' %>
+              <%= form.submit "出席にする",
+                    style: "background: lightgreen; border: none; padding: 4px 8px; margin-top: 4px;" %>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

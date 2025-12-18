@@ -27,4 +27,12 @@ Rails.application.routes.draw do
   resources :schedules, only: [:index]
   # ルートURLをスケジュール一覧に設定
   # root to: 'schedules#index'
+  # 追加コード
+  resources :attendances, only: [:index, :new, :create]
+
+  # 教員用のルーティング (faculties/attendances#index などにアクセス)
+  namespace :faculties do
+    resources :attendances, only: [:index, :update] do
+    end
+  end
 end

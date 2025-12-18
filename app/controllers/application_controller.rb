@@ -9,4 +9,13 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:sign_in, keys: [:faculty_number])
   end
 
+  def after_sign_in_path_for(resource)
+    if resource.is_a?(Faculty)
+      faculties_attendances_path   # 教員ログイン後の遷移先
+    elsif resource.is_a?(Student)
+      new_attendance_path          # 学生ログイン後の遷移先（テスト）
+    else
+      super
+    end
+  end
 end

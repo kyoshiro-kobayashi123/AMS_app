@@ -23,5 +23,9 @@ module AmsApp
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+
+    # 追加コード
+    config.time_zone = 'Tokyo'
   end
 end
