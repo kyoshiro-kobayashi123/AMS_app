@@ -1,3 +1,4 @@
+
 /* ログイン画面 */
 * {
     margin: 0;
@@ -127,3 +128,22 @@ body {
     color: #4a69bd;
 }
 
+.weekly-calendar table {
+    border-collapse: separate;
+    border-spacing: 6px;
+}
+
+.weekly-calendar table.table > :not(caption) > * > * {
+    border: 1px solid #c6c7c8 !important;
+}
+
+  /* 教員名のスタイル */
+.faculty-name {
+    background-color: #5cb85c;
+    color: white;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 4px;
+}

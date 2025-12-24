@@ -2,21 +2,25 @@
 
 <nav class="mb-3 d-flex justify-content-between align-items-center">
   <%= link_to '<< 先週', schedules_path(start_date: (@date || Date.today) - 1.week), class: "btn btn-primary" %>
-  <span class="h5"><%= @date.strftime("%Y年 %m月") %></span>
+  <span class="h5">
+    <% friday = @week_days.find { |day| day.wday == 5 } || @week_days.last %>
+<%= @week_days.first.strftime("%Y年 %m月%d日") %>～<%= friday.strftime("%m月%d日") %> 
+
   <%= link_to '次週 >>', schedules_path(start_date: (@date || Date.today) + 1.week), class: "btn btn-primary" %>
 </nav>
 
 <div class="weekly-calendar">
   <table class="table table-bordered text-center align-middle">
+  <% weekdays = (@week_days || []).select { |day| (1..5).include?(day.wday) } %>
     <thead class="table-light">
       <tr>
         <!-- 左上の「日時」ヘッダー -->
         <th style="width: 100px; background-color: #f8f9fa;">日時</th>
         
         <!-- 横軸: 日付ヘッダー -->
-        <% (@week_days || []).each do |day| %>
+        <% (weekdays || []).each do |day| %>
           <th>
-            <%= day.day %><br>
+            <%= day.day %>
             (<%= %w(日 月 火 水 木 金 土)[day.wday] %>)
           </th>
         <% end %>
@@ -26,16 +30,16 @@
     <tbody>
       <!-- 縦軸: 各時限ごとにループ -->
       <% @periods.each do |period| %>
+        <% next if period[:name] == "昼休み" %>
         <tr>
           <!-- 左端: 時限と時間の表示 -->
           <th class="align-middle bg-light">
-            <div><%= period[:time].split('-')[0] %>-</div>
-            <div><%= period[:time].split('-')[1] %></div>
+            <div><%= period[:time] %></div>
             <div class="fw-bold"><%= period[:name] %></div>
           </th>
           
           <!-- 横軸: 各日付ごとにセルを作成 -->
-          <% (@week_days || []).each do |day| %>
+          <% (weekdays || []).each do |day| %>
             <td>
               <%# マップから該当する日付・時間のデータを取り出す %>
               <% time_slot = @time_slots_map[[day, period[:time]]] %>
@@ -47,14 +51,29 @@
                     <%= time_slot.lesson&.lesson_name %>
                   </div>
 
-                  <!-- ▼▼▼ 教員だけ編集ボタンが見える ▼▼▼ -->
+                  <!-- ▼▼▼ 教員名を表示 ▼▼▼ -->
+                  <% if time_slot.lesson&.faculty %>
+                    <div class="faculty-name">
+                      <%= time_slot.lesson.faculty.name.split(/[\s ]/).first %>先生
+                    </div>
+                  <% end %>
+
+                  <!-- ▼▼▼ 教室番号を表示 ▼▼▼ -->
+                  <% if time_slot.classroom %>
+                    <div class="text-muted small mb-1">
+                      <%= time_slot.classroom.room_number %>
+                    </div>
+                  <% end %>
+
+  <!-- ▼▼▼ 教員だけ編集ボタンが見える ▼▼▼ -->
                   <% if faculty_signed_in?  %>
                     <div class="mt-1">
                       <%= link_to '編集', edit_schedule_path(time_slot), class: "btn btn-sm btn-outline-secondary" %>
                     </div>
                   <% end %>
                 </div>
-              <% else %>
+              <% else %> 
+
                 <!-- 授業がない場合（空きコマ） -->
                 
                 <!-- ▼▼▼ 教員だけ『追加』ボタンが見える ▼▼▼ -->
