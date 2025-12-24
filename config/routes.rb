@@ -24,7 +24,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
-  resources :schedules, only: [:index]
+  resources :schedules, only: [:index, :new, :create, :edit, :update, :destroy]
   # ルートURLをスケジュール一覧に設定
   # root to: 'schedules#index'
   # 追加コード
@@ -34,5 +34,6 @@ Rails.application.routes.draw do
   namespace :faculties do
     resources :attendances, only: [:index, :update] do
     end
+  get 'schedules', to: '/schedules#index'
   end
 end
