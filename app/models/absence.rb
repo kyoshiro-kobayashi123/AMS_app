@@ -1,9 +1,8 @@
-# app/models/attendance.rb
-class Attendance < ApplicationRecord
+class Absence < ApplicationRecord
   belongs_to :student
   belongs_to :time_slot
-
-  STATUSES = %w[present late early_leave absent].freeze
-
-  validates :status, inclusion: { in: STATUSES }
+  
+  validates :kind, :reason, presence: true
+  
+  # kind: '病欠', '公欠', '忌引', etc.
 end

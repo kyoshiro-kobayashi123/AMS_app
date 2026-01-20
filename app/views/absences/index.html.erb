@@ -1,6 +1,5 @@
 <h1>欠席届提出</h1>
-
-<nav>
+<!--<nav>
   <% if student_signed_in? %>
     <span>
       ログイン中の生徒番号: <strong><%= current_student.student_number %></strong>
@@ -9,26 +8,32 @@
   <% else %>
     <%= link_to '生徒ログイン', new_student_session_path %>
   <% end %>
-</nav>
+</nav>-->
 
 <%= form_with model: @absence, url: absences_path, local: true do |f| %>
 
+
+<h2>欠席する授業</h2>
+  <%= f.select :kind,
+      [['選択してください', ''], ['公欠', '公欠'], ['欠席', '欠席'], ['忌引', '忌引']],
+      {}, class: "form-select", style: "width: 100%; height: 50px; margin-bottom: 20px;" %>
+  
   <h2>届出種類</h2>
   <%= f.select :kind,
       [['選択してください', ''], ['公欠', '公欠'], ['欠席', '欠席'], ['忌引', '忌引']],
-      {}, class: "form-select" %>
+      {}, class: "form-select", style: "width: 100%; height: 50px; margin-bottom: 20px;" %>
 
   <h2>公欠理由（公欠の場合）</h2>
   <%= f.select :reason,
       [['選択してください', ''], ['就職活動関連', '就職活動関連'], ['葬式など', '葬式など'], ['その他', 'その他']],
-      {}, class: "form-select" %>
+      {}, class: "form-select", style: "width: 100%; height: 50px; margin-bottom: 20px;" %>
 
-  <div>
+  <div style="margin-bottom: 30px;">
     <h2>詳細入力</h2>
-    <%= f.text_field :detail, class: "form-control" %>
+    <%= f.text_area :detail, class: "form-control", placeholder: "理由の詳細を入力してください（例：〇〇企業の面接のため）", style: "width: 100%; height: 100px;" %>
   </div>
 
-  <h2>対象日</h2>
+  <!--<h2>対象日</h2>
   <%= f.date_field :target_date, class: "form-control" %>
 
   <h2>対象コマ</h2>
@@ -37,10 +42,50 @@
       <%= f.check_box :periods, { multiple: true }, i, nil %>
       <%= "#{i}コマ" %>
     </label>
-  <% end %>
+  <% end %>-->
 
-  <div>
-    <%= f.submit "提出", class: "btn btn-primary" %>
+  <div class="notes-section">
+    <h2>注意事項：</h2>
+    <ul class="notes-list">
+      <li>欠席届は授業開始前までに提出してください</li>
+      <li>公欠届は権利者の承認が必要です</li>
+      <li>虚偽の申請は処分の対象となります</li>
+    </ul>
   </div>
+
+  <div style="text-align: center; margin-bottom: 50px;">
+    <%= f.submit "提出", class: "btn btn-primary", style: "background-color: black; border-color: black;" %>
+    <%= link_to "キャンセル", :back, class: "btn btn-secondary" %>
+  </div>
+
+<h2>提出済み欠席届一覧</h2>
+
+<table class="absence-history-table">
+  <thead>
+    <tr>
+      <th>提出日</th>
+      <th>対象授業</th>
+      <th>種類</th>
+      <th>理由</th>
+      <th>承認状況</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
 
 <% end %>

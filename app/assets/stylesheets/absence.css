@@ -1,0 +1,96 @@
+/* 欠席・公欠届画面用スタイル */
+
+/* 申請履歴テーブル */
+.absence-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background-color: white;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.2rem;
+  }
+
+.absence-history-table th,
+.absence-history-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.absence-history-table th {
+    background-color: #f9f9f9;
+    color: #333;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+}
+
+.absence-history-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* ステータスバッジ */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: white;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.status-pending {
+    background-color: #f0ad4e; /* 申請中: オレンジ */
+}
+
+.status-approved {
+    background-color: #5cb85c; /* 承認済: 緑 (application.cssのprimary色) */
+}
+
+.status-rejected {
+    background-color: #d9534f; /* 却下: 赤 */
+}
+
+/* 日付範囲選択などのフォーム調整 */
+.date-range-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-separator {
+    color: #666;
+    font-weight: bold;
+}
+
+/* 注意事項リスト */
+.notes-list {
+    padding-left: 20px; /* 左側のインデント幅を調整 */
+    margin-top: 5px;
+}
+
+.notes-list li {
+    margin-bottom: 5px; /* 行間を少し空けて読みやすくする */
+}
+
+/* 注意事項セクション */
+.notes-section {
+    background-color: #d1ecf1; /* 水色 */
+    color: #0c5460; /* 青色 */
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 30px;
+}
+
+.form-control {
+    margin-bottom: 15px;
+    padding: 10px;
+}

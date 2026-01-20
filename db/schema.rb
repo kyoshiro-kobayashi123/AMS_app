@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_20_023748) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_24_013910) do
   create_table "absences", force: :cascade do |t|
     t.integer "student_id", null: false
     t.integer "time_slot_id", null: false
@@ -36,6 +36,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_023748) do
     t.datetime "updated_at", null: false
     t.index ["student_id"], name: "index_attendances_on_student_id"
     t.index ["time_slot_id"], name: "index_attendances_on_time_slot_id"
+  end
+
+  create_table "classrooms", force: :cascade do |t|
+    t.string "room_number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "faculties", force: :cascade do |t|
@@ -87,6 +93,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_023748) do
     t.time "attendance_start_time", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "classroom_id"
     t.index ["lesson_id"], name: "index_time_slots_on_lesson_id"
   end
 
