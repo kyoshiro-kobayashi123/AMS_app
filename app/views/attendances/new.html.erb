@@ -1,3 +1,27 @@
+<!-- ▼▼▼ ここに追加 ▼▼▼ -->
+<!-- ハンバーガーボタン -->
+<button class="hamburger" id="js-hamburger">
+  <span class="hamburger__line"></span>
+  <span class="hamburger__line"></span>
+  <span class="hamburger__line"></span>
+  <span class="hamburger__text">MENU</span>
+</button>
+
+<!-- ナビゲーションメニュー -->
+<nav class="header__nav" id="js-nav">
+  <ul class="nav-items">
+    <li class="nav-items__item">
+      <%= link_to "出席登録フォームへ", new_attendance_path %>
+    </li>
+    <li class="nav-items__item">
+      <%= link_to "コマ確認へ", schedules_path %>
+    </li>
+    <li class="nav-items__item">
+      <%= link_to "トップページへ", root_path %>
+    </li>
+  </ul>
+</nav>
+<!-- ▲▲▲ ここまで ▲▲▲ -->
 <h1>出席登録フォーム (動作確認用)</h1>
 
 <% if flash[:notice] %>

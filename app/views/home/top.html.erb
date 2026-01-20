@@ -1,3 +1,44 @@
+<%# ▼▼▼ ログイン時のみハンバーガーメニューを表示 ▼▼▼ %>
+<% if student_signed_in? || faculty_signed_in? %>
+  <!-- ハンバーガーボタン -->
+  <button class="hamburger" id="js-hamburger">
+    <span class="hamburger__line"></span>
+    <span class="hamburger__line"></span>
+    <span class="hamburger__line"></span>
+    <span class="hamburger__text">MENU</span>
+  </button>
+
+  <!-- ナビゲーションメニュー -->
+  <nav class="header__nav" id="js-nav">
+    <ul class="nav-items">
+      <%# 学生の場合のメニュー %>
+      <% if student_signed_in? %>
+        <li class="nav-items__item">
+          <%= link_to "出席登録フォームへ", new_attendance_path %>
+        </li>
+        <li class="nav-items__item">
+          <%= link_to "コマ確認へ", schedules_path %>
+        </li>
+      <% end %>
+
+      <%# 教職員の場合のメニュー %>
+      <% if faculty_signed_in? %>
+        <li class="nav-items__item">
+          <%= link_to "出席管理画面へ", faculties_attendances_path %>
+        </li>
+        <li class="nav-items__item">
+          <%= link_to "時間割確認へ", schedules_path %>
+        </li>
+      <% end %>
+
+      <%# 共通メニュー %>
+      <li class="nav-items__item">
+        <%= link_to "トップページへ", root_path %>
+      </li>
+    </ul>
+  </nav>
+<% end %>
+<%# ▲▲▲ ここまで ▲▲▲ %>
 <div class="container top-page-container">
   <%# ヘッダー部分 %>
   <div class="top-header">
