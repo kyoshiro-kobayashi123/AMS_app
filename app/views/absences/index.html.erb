@@ -31,6 +31,9 @@
     <li class="nav-items__item">
       <%= link_to "トップページへ", root_path %> <%# top_path ではなく root_path に修正 %>
     </li>
+    <li class="nav-items__item">
+      <%= link_to "ログアウト", destroy_student_session_path, data: { turbo_method: :delete} %>
+    </li>
   </ul>
 </nav>
 

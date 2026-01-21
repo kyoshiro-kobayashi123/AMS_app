@@ -19,6 +19,9 @@
         <li class="nav-items__item">
           <%= link_to "コマ確認へ", schedules_path %>
         </li>
+        <li class="nav-items__item">
+          <%= link_to "ログアウト", destroy_student_session_path, data: { turbo_method: :delete} %>
+        </li>
       <% end %>
 
       <%# 教職員の場合のメニュー %>
@@ -28,6 +31,9 @@
         </li>
         <li class="nav-items__item">
           <%= link_to "時間割確認へ", schedules_path %>
+        </li>
+        <li class="nav-items__item">
+          <%= link_to "ログアウト", destroy_faculty_session_path, data: { turbo_method: :delete} %>
         </li>
       <% end %>
 
@@ -51,6 +57,9 @@
     <div class="logged-in-box student-logged">
       <h3><%= image_tag "student.png", alt: "学生", style: "width: 40px; height: 40px; vertical-align: middle; margin-right: 10px;" %> ようこそ、<%= current_student.name %> さん</h3>
       <p>学籍番号: <%= current_student.student_number %></p>
+      <%= link_to "出席登録フォームへ", new_attendance_path,
+          class: "btn btn-danger btn-lg",
+          style: "padding: 12px 40px; font-size: 1.1rem;" %>
       <%= link_to "ログアウト", destroy_student_session_path, method: :delete,
           class: "btn btn-danger btn-lg",
           style: "padding: 12px 40px; font-size: 1.1rem;" %>
@@ -60,6 +69,9 @@
   <% elsif faculty_signed_in? %>
     <div class="logged-in-box faculty-logged">
       <h3><%= image_tag "teacher.png", alt: "教職員", style: "width: 40px; height: 40px; vertical-align: middle; margin-right: 10px;" %> ようこそ、<%= current_faculty.try(:name) || "教職員" %> 先生</h3>
+      <%= link_to "出席管理画面へ", faculties_attendances_path,
+          class: "btn btn-danger btn-lg",
+          style: "padding: 12px 40px; font-size: 1.1rem;" %>
       <%= link_to "ログアウト", destroy_faculty_session_path, method: :delete,
           class: "btn btn-danger btn-lg",
           style: "padding: 12px 40px; font-size: 1.1rem;" %>
