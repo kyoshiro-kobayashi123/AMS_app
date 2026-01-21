@@ -1,97 +1,109 @@
-<!-- ▼▼▼ ここに追加 ▼▼▼ -->
-<!-- ハンバーガーボタン -->
-<button class="hamburger" id="js-hamburger">
-  <span class="hamburger__line"></span>
-  <span class="hamburger__line"></span>
-  <span class="hamburger__line"></span>
-  <span class="hamburger__text">MENU</span>
-</button>
+<div class="schedule-wrapper">
 
-<!-- ナビゲーションメニュー -->
-<nav class="header__nav" id="js-nav">
-  <ul class="nav-items">
-    <li class="nav-items__item">
-      <%= link_to "出席登録フォームへ", new_attendance_path %>
-    </li>
-    <li class="nav-items__item">
-      <%= link_to "コマ確認へ", schedules_path %>
-    </li>
-    <li class="nav-items__item">
-      <%= link_to "トップページへ", root_path %>
-    </li>
-  </ul>
-</nav>
-<!-- ▲▲▲ ここまで ▲▲▲ -->
-<h1>週間スケジュール</h1>
+  <!-- ハンバーガーボタン -->
+  <button class="hamburger" id="js-hamburger">
+    <span class="hamburger__line"></span>
+    <span class="hamburger__line"></span>
+    <span class="hamburger__line"></span>
+    <span class="hamburger__text">MENU</span>
+  </button>
 
-<nav class="mb-3 d-flex justify-content-between align-items-center">
-  <%= link_to '<< 先週', schedules_path(start_date: (@date || Date.today) - 1.week), class: "btn btn-primary" %>
-  <span class="h5"><%= @date.strftime("%Y年 %m月") %></span>
-  <%= link_to '次週 >>', schedules_path(start_date: (@date || Date.today) + 1.week), class: "btn btn-primary" %>
-</nav>
+  <!-- ナビゲーションメニュー -->
+  <nav class="header__nav" id="js-nav">
+    <ul class="nav-items">
+      <li class="nav-items__item">
+        <%= link_to "出席登録フォームへ", new_attendance_path %>
+      </li>
+      <li class="nav-items__item">
+        <%= link_to "コマ確認へ", schedules_path %>
+      </li>
+      <li class="nav-items__item">
+        <%= link_to "トップページへ", root_path %>
+      </li>
+    </ul>
+  </nav>
 
-<div class="weekly-calendar">
-  <table class="table table-bordered text-center align-middle">
-    <thead class="table-light">
-      <tr>
-        <!-- 左上の「日時」ヘッダー -->
-        <th style="width: 100px; background-color: #f8f9fa;">日時</th>
+  <!-- コンテンツ全体 -->
+  <div class="schedule-container-wrapper">
+
+    <!-- タイトル -->
+    <h1>週間スケジュール</h1>
+
+    <!-- ▼▼▼ 修正: Bootstrapクラス依存をやめ、独自クラス schedule-nav を使用 ▼▼▼ -->
+    <div class="schedule-nav">
+      <!-- 左: 前週ボタン -->
+      <div>
+        <%= link_to '<< 先週', schedules_path(start_date: (@date || Date.today) - 1.week), class: "btn btn-primary" %>
+      </div>
+      
+      <!-- 中央: 年月表示 -->
+      <div class="schedule-month-title">
+        <%= @date.strftime("%Y年 %m月") %>
+      </div>
+      
+      <!-- 右: 次週ボタン -->
+      <div>
+        <%= link_to '次週 >>', schedules_path(start_date: (@date || Date.today) + 1.week), class: "btn btn-primary" %>
+      </div>
+    </div>
+
+    <!-- スケジュール表 -->
+    <div class="weekly-calendar">
+      <table class="table table-bordered table-bordered-black text-center align-middle w-100">
+        <thead>
+          <tr>
+            <th class="schedule-time-header">日時</th>
+            <% (@week_days || []).each do |day| %>
+              <th class="schedule-header-dark-blue">
+                <%= day.day %><br>
+                (<%= %w(日 月 火 水 木 金 土)[day.wday] %>)
+              </th>
+            <% end %>
+          </tr>
+        </thead>
         
-        <!-- 横軸: 日付ヘッダー -->
-        <% (@week_days || []).each do |day| %>
-          <th>
-            <%= day.day %><br>
-            (<%= %w(日 月 火 水 木 金 土)[day.wday] %>)
-          </th>
-        <% end %>
-      </tr>
-    </thead>
-    
-    <tbody>
-      <!-- 縦軸: 各時限ごとにループ -->
-      <% @periods.each do |period| %>
-        <tr>
-          <!-- 左端: 時限と時間の表示 -->
-          <th class="align-middle bg-light">
-            <div><%= period[:time].split('-')[0] %>-</div>
-            <div><%= period[:time].split('-')[1] %></div>
-            <div class="fw-bold"><%= period[:name] %></div>
-          </th>
-          
-          <!-- 横軸: 各日付ごとにセルを作成 -->
-          <% (@week_days || []).each do |day| %>
-            <td>
-              <%# マップから該当する日付・時間のデータを取り出す %>
-              <% time_slot = @time_slots_map[[day, period[:time]]] %>
+        <tbody>
+          <% @periods.each do |period| %>
+            <tr>
+              <th class="align-middle bg-light" style="border: 1px solid #000;">
+                <div><%= period[:time].split('-')[0] %>-</div>
+                <div><%= period[:time].split('-')[1] %></div>
+                <div class="fw-bold"><%= period[:name] %></div>
+              </th>
               
-              <% if time_slot %>
-                <!-- 授業がある場合 -->
-                <div class="lesson-card p-2" style="background-color: #eef8ff; border-radius: 5px;">
-                  <div class="fw-bold mb-1 text-primary">
-                    <%= time_slot.lesson&.lesson_name %>
-                  </div>
+              <% (@week_days || []).each do |day| %>
+                <td>
+                  <% time_slot = @time_slots_map[[day, period[:time]]] %>
+                  
+                  <% if time_slot %>
+                    <!-- 授業あり -->
+                    <div class="lesson-card">
+                      <div class="fw-bold mb-1">
+                        <%= time_slot.lesson&.lesson_name %>
+                      </div>
 
-                  <!-- ▼▼▼ 教員だけ編集ボタンが見える ▼▼▼ -->
-                  <% if faculty_signed_in?  %>
-                    <div class="mt-1">
-                      <%= link_to '編集', edit_schedule_path(time_slot), class: "btn btn-sm btn-outline-secondary" %>
+                      <% if faculty_signed_in?  %>
+                        <div class="mt-1">
+                          <%= link_to '編集', edit_schedule_path(time_slot), class: "btn btn-sm btn-outline-secondary" %>
+                        </div>
+                      <% end %>
                     </div>
+                  <% else %>
+                     <!-- 空きコマ -->
+                     <% if faculty_signed_in? %>
+                       <%= link_to '+登録', new_schedule_path(date: day, time: period[:time]), class: "btn btn-sm btn-light text-muted" %>
+                     <% else %>
+                       &nbsp;
+                     <% end %>
                   <% end %>
-                </div>
-              <% else %>
-                <!-- 授業がない場合（空きコマ） -->
-                
-                <!-- ▼▼▼ 教員だけ『追加』ボタンが見える ▼▼▼ -->
-                <% if  faculty_signed_in? %>
-                  <%= link_to '+登録', new_schedule_path(date: day, time: period[:time]), class: "btn btn-sm btn-light text-muted" %>
-                <% else %>
-                  &nbsp;
-                <% end %>
+                </td>
               <% end %>
-            </td>
+            </tr>
           <% end %>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+        </tbody>
+      </table>
+    </div>
+
+  </div> <!-- schedule-container-wrapper end -->
+
+</div> <!-- schedule-wrapper end -->

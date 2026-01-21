@@ -1,0 +1,109 @@
+/* --- スケジュール一覧画面専用スタイル --- */
+
+/* 全体のレイアウトコンテナ */
+.schedule-wrapper .schedule-container-wrapper {
+  width: 100%;
+  max-width: 100%; /* 修正: 1200px制限を解除して画面いっぱいにする */
+  margin: 0 auto;
+  padding: 0 40px; /* 修正: 左右の余白を少し増やして見やすくする（お好みで調整） */
+  text-align: center;
+}
+
+/* 年月タイトル */
+.schedule-wrapper .schedule-month-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  flex-grow: 1;
+  text-align: center;
+}
+
+/* タイトル「週間スケジュール」 */
+.schedule-wrapper h1 {
+  text-align: center;
+  margin: 20px 0;
+  width: 100%;
+  display: block;
+}
+
+/* ナビゲーションバー */
+.schedule-wrapper .schedule-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* テーブル全体の枠線を黒く太く */
+.schedule-wrapper .table-bordered-black {
+  border: 1px solid #000 !important;
+  margin: 0 auto;
+  width: 100% !important; /* 念のため強制的に100% */
+}
+.schedule-wrapper .table-bordered-black th,
+.schedule-wrapper .table-bordered-black td {
+  border: 1px solid #000 !important;
+  vertical-align: middle !important;
+}
+
+/* ヘッダー（濃い青色背景・白文字） */
+.schedule-wrapper .schedule-header-dark-blue {
+  background-color: #003366 !important;
+  color: #ffffff !important;
+}
+
+/* 日時ヘッダー（左上） */
+.schedule-wrapper .schedule-time-header {
+  width: 100px;
+  background-color: #003366 !important;
+  color: #ffffff !important;
+}
+
+/* 左端（時限）の列 */
+.schedule-wrapper .schedule-period-header {
+  background-color: #003366 !important;
+  color: #ffffff !important;
+}
+
+/* 授業カード（コマ） */
+.schedule-wrapper .lesson-card {
+  background-color: transparent !important;
+  border-radius: 0;
+  padding: 0;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 60px;
+
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-size: 0.9rem;
+  color: #333;
+  text-align: center;
+}
+
+/* リンク文字色 */
+.schedule-wrapper .lesson-card a {
+  color: #333;
+  text-decoration: none;
+}
+.schedule-wrapper .lesson-card a:hover {
+  text-decoration: underline;
+}
+
+/* ボタンのリセット */
+.schedule-wrapper .btn-primary {
+  color: #fff !important;
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  border-radius: 4px !important;
+  padding: 6px 12px !important;
+  font-size: 1rem !important;
+  margin: 0 !important;
+  display: inline-block;
+}
