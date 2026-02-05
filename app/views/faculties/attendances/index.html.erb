@@ -1,5 +1,3 @@
-<h1>教員向け 出席管理画面 (動作確認用)</h1>
-
 <% if notice %>
   <p style="color: green;">✅ <%= notice %></p>
 <% end %>
@@ -9,54 +7,60 @@
 
 <hr>
 
-<h2>検索</h2>
-
-<%= form_with(url: faculties_attendances_path, method: :get, local: true) do |form| %>
-  <fieldset style="padding: 10px; margin-bottom: 15px;">
-    <div style="margin-bottom: 8px;">
-      <%= form.label :lesson_name, "授業名" %>
-      <%= form.text_field :lesson_name, value: params[:lesson_name] %>
+<div style="background-color: white; padding: 20px; border: 1px solid #ccc;">
+    <h2 style="margin: 0 0 30px 0; width: 100%; font-size: 2rem; color: #007bff;">出席管理</h2>
+    <%= form_with(url: faculties_attendances_path, method: :get, local: true, html: { style: "display: flex; flex-wrap: wrap; align-items: center; gap: 30px;" }) do |form| %>
+    <div style="font-size: 1.2rem;">
+      <%= form.label :lesson_name, "授業名", style: "margin-right: 10px;" %>
+      <%= form.text_field :lesson_name, value: params[:lesson_name], style: "padding: 5px; font-size: 1rem;" %>
     </div>
 
-    <div style="margin-bottom: 8px;">
-      <%= form.label :date, "日付" %>
-      <%= form.date_field :date, value: params[:date] || Date.current %>
+    <div style="font-size: 1.2rem;">
+      <%= form.label :date, "日付", style: "margin-right: 10px;" %>
+      <%= form.date_field :date, value: params[:date] || Date.current, style: "padding: 5px; font-size: 1rem;" %>
     </div>
 
-    <%= form.submit "検索", style: "padding: 4px 10px;" %>
-  </fieldset>
-<% end %>
+    <%= form.submit "表示", style: "padding: 10px 25px; font-size: 1.1rem; background-color: #007bff; color: white; border: none; border-radius: 5px;" %>
+    <% end %>
 
-<hr>
+    <div style="width: 100%; display: flex; align-items: center; gap: 30px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc;">
+  <h2 style="margin: 0;">出席状況</h2>
 
-<h2>集計結果</h2>
+  <ul style="display: flex; list-style: none; padding: 0; margin: 0; gap: 10px; font-size: 1.1rem;">
+    <% @json_response[:counts].to_a.reverse.each_with_index do |(status, count), index| %>
+      <% label =
+        case status
+        when 'present'      then '出席'
+        when 'late'         then '遅刻'
+        when 'early_leave'  then '早退'
+        when 'absent'       then '欠席'
+        else status.upcase
+        end
+      %>
+      <% color =
+        case status
+        when 'present'      then 'green'
+        when 'late'         then '#e6b800'
+        when 'early_leave'  then 'deepskyblue'
+        when 'absent'       then 'red'
+        else 'inherit'
+        end
+      %>
+      <li style="color: <%= color %>;">
+        <strong><%= label %>:</strong>
+        <%= count %>件
+      </li>
+      <% if index < @json_response[:counts].size - 1 %>
+        <li>/</li>
+      <% end %>
+    <% end %>
+  </ul>
+    </div>
 
-<p><strong>総件数:</strong> <%= @json_response[:details].count %></p>
-<ul>
-  <% @json_response[:counts].each do |status, count| %>
-    <% label =
-      case status
-      when 'present'      then '出席'
-      when 'late'         then '遅刻'
-      when 'early_leave'  then '早退'
-      when 'absent'       then '欠席'
-      else status.upcase
-      end
-    %>
-    <li>
-      <strong><%= label %>:</strong>
-      <%= count %>件
-    </li>
-  <% end %>
-</ul>
-
-<hr>
-
-<h2>詳細一覧</h2>
-
-<table border="1" cellpadding="10" style="width: 100%; border-collapse: collapse;">
+    <div style="width: 100%; padding-top: 20px; border-top: 1px solid #ccc;">
+      <table border="1" cellpadding="30" style="width: 100%; border-collapse: collapse; text-align: center;">
   <thead>
-    <tr>
+    <tr style="font-size: 1.2rem; background-color: #f2f2f2;">
       <th>学生番号</th>
       <th>氏名</th>
       <th>授業</th>
@@ -103,51 +107,77 @@
         <td><%= att[:admin_approval] ? '✅ 承認済' : '❌ 未承認' %></td>
 
         <td>
-          <%# --- 遅刻承認ボタン（遅刻＆未承認時のみ） --- %>
-          <% if status == 'late' && !att[:admin_approval] %>
-            <%= form_with(url: faculties_attendance_path(att[:id]),
-                          method: :patch,
-                          local: true) do |form| %>
-              <%= form.hidden_field :admin_approval, value: true %>
-              <%= form.submit "遅刻承認",
-                    style: "background: yellowgreen; border: none; padding: 4px 8px; margin-bottom: 4px;" %>
-            <% end %>
-          <% end %>
+          <%
+            # 利用可能な操作を収集
+            actions = []
+            if status == 'late' && !att[:admin_approval]
+              actions << { label: "遅刻承認", params: { admin_approval: true }, style: "background: yellowgreen; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px;" }
+            end
+            if %w[present late].include?(status)
+              actions << { label: "早退にする", params: { status: 'early_leave' }, style: "background: lightskyblue; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px;" }
+            end
+            if status != 'absent'
+              actions << { label: "欠席にする", params: { status: 'absent' }, style: "background: salmon; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px;" }
+            end
+            if status != 'present'
+              actions << { label: "出席にする", params: { status: 'present' }, style: "background: lightgreen; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px;" }
+            end
+          %>
 
-          <%# --- 早退にする（出席 or 遅刻のときだけ出す） --- %>
-          <% if %w[present late].include?(status) %>
-            <%= form_with(url: faculties_attendance_path(att[:id]),
-                          method: :patch,
-                          local: true) do |form| %>
-              <%= form.hidden_field :status, value: 'early_leave' %>
-              <%= form.submit "早退にする",
-                    style: "background: lightskyblue; border: none; padding: 4px 8px; margin-bottom: 4px;" %>
+          <% if actions.size > 1 %>
+            <%# 複数の操作が可能な場合はセレクトボックスを表示 %>
+            <%= form_with(url: faculties_attendance_path(att[:id]), method: :patch, local: true, class: "attendance-update-form") do |form| %>
+              <div class="dynamic-hidden-fields" style="display: none;"></div>
+              <select name="action" onchange="this.form.dispatchEvent(new CustomEvent('submitAction', { bubbles: true, detail: { select: this } }))" style="padding: 10px; margin: 5px; font-size: 1rem;">
+                <option value="" selected disabled>変更</option>
+                <% actions.each do |action| %>
+                  <option value='<%= action[:params].to_json.encode(xml: :attr) %>'><%= action[:label] %></option>
+                <% end %>
+              </select>
             <% end %>
-          <% end %>
-
-          <%# --- 欠席にする（今が欠席じゃないときだけ） --- %>
-          <% if status != 'absent' %>
-            <%= form_with(url: faculties_attendance_path(att[:id]),
-                          method: :patch,
-                          local: true) do |form| %>
-              <%= form.hidden_field :status, value: 'absent' %>
-              <%= form.submit "欠席にする",
-                    style: "background: salmon; border: none; padding: 4px 8px; margin-top: 4px;" %>
+          <% elsif actions.size == 1 %>
+            <%# 操作が1つの場合はボタンを表示 %>
+            <% action = actions.first %>
+            <%= form_with(url: faculties_attendance_path(att[:id]), method: :patch, local: true) do |form| %>
+              <% action[:params].each do |key, value| %>
+                <%= form.hidden_field key, value: value %>
+              <% end %>
+              <%= form.submit action[:label], style: action[:style] %>
             <% end %>
-          <% end %>
-
-          <%# --- 出席にする（今が出席じゃないときだけ） --- %>
-          <% if status != 'present' %>
-            <%= form_with(url: faculties_attendance_path(att[:id]),
-                          method: :patch,
-                          local: true) do |form| %>
-              <%= form.hidden_field :status, value: 'present' %>
-              <%= form.submit "出席にする",
-                    style: "background: lightgreen; border: none; padding: 4px 8px; margin-top: 4px;" %>
-            <% end %>
+          <% else %>
+            -
           <% end %>
         </td>
       </tr>
     <% end %>
   </tbody>
 </table>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.attendance-update-form').forEach(form => {
+    form.addEventListener('submitAction', function(event) {
+      const selectElement = event.detail.select;
+      const jsonParams = selectElement.value;
+      if (!jsonParams) return;
+
+      const params = JSON.parse(jsonParams);
+      const hiddenFieldsContainer = form.querySelector('.dynamic-hidden-fields');
+      hiddenFieldsContainer.innerHTML = ''; // 以前のフィールドをクリア
+
+      // パラメータに基づいて隠しフィールドを動的に生成
+      Object.keys(params).forEach(key => {
+        const hiddenField = document.createElement('input');
+        hiddenField.type = 'hidden';
+        hiddenField.name = key;
+        hiddenField.value = params[key];
+        hiddenFieldsContainer.appendChild(hiddenField);
+      });
+
+      form.submit();
+    });
+  });
+});
+</script>
+</div>
